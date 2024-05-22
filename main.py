@@ -1,3 +1,4 @@
+import torch
 from ultralyticsplus import YOLO, render_result
 import cv2
 import os
@@ -5,7 +6,7 @@ import os
 
 if __name__ == '__main__':
 
-    results_path = 'results_stocks-22-05-24'
+    results_path = 'results_stocks-22-05-24_new'
     if not os.path.exists(results_path):
         os.makedirs(results_path)
 
@@ -20,7 +21,6 @@ if __name__ == '__main__':
     model.overrides['iou'] = 0.45  # NMS IoU threshold
     model.overrides['agnostic_nms'] = False  # NMS class-agnostic
     model.overrides['max_det'] = 1000  # maximum number of detections per image
-
 
     for img in src_data:
         if img.endswith('.png'):
@@ -40,8 +40,20 @@ if __name__ == '__main__':
             # cv2.waitKey(50)
             # cv2.destroyAllWindows()
 
-            # Save the annotated frame
-            cv2.imwrite(os.path.join(results_path, img), annotated_frame)
+            # results conditions:
+            if len(results[0].boxes) > 0:
+
+                print(f'Found patterns in {img}')
+                class_found = results[0].boxes.cls.tolist()
+                class_found = [int(k) for k in class_found]
+                boxes_found = results[0].boxes.xywhn.tolist()
+                if 5 in class_found:
+                    print('Bullish Engulfing')
+                    idx_box = class_found.index(5)
+                    if boxes_found[idx_box][0] > 0.8 and boxes_found[idx_box][1] > 0.8:
+                        print('Strong Bullish Engulfing for {img}')
+                        # Save the annotated frame
+                        cv2.imwrite(os.path.join(results_path, img), annotated_frame)
 
 
 print('Done')
