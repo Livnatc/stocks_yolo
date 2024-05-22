@@ -1,8 +1,17 @@
 from ultralyticsplus import YOLO, render_result
 import cv2
+import os
 
 
 if __name__ == '__main__':
+
+    results_path = 'results_stocks-22-05-24'
+    if not os.path.exists(results_path):
+        os.makedirs(results_path)
+
+    src_data_path = 'stocks-22-05-24'
+    src_data = os.listdir(src_data_path)
+
     # load model
     model = YOLO('foduucom/stockmarket-pattern-detection-yolov8')
 
@@ -12,26 +21,27 @@ if __name__ == '__main__':
     model.overrides['agnostic_nms'] = False  # NMS class-agnostic
     model.overrides['max_det'] = 1000  # maximum number of detections per image
 
-    # initialize video capture
-    # Open the video file
-    img_path = "nvda_3.png"
-    # cap = cv2.VideoCapture(video_path)
 
-    # Loop through the video frames
-    # while cap.isOpened():
-        # Read a frame from the video
-    frame = cv2.imread(img_path)
+    for img in src_data:
+        if img.endswith('.png'):
 
-    # Run YOLOv8 inference on the frame
-    results = model(frame)
+            # Open the img file
+            img_path = os.path.join(src_data_path, img)
+            frame = cv2.imread(img_path)
 
-    # Visualize the results on the frame
-    annotated_frame = results[0].plot()
+            # Run YOLOv8 inference on the frame
+            results = model(frame)
 
-    # Display the annotated frame
-    cv2.imshow("YOLOv8 Inference", annotated_frame)
-    cv2.waitKey(50)
-    cv2.destroyAllWindows()
+            # Visualize the results on the frame
+            annotated_frame = results[0].plot()
+
+            # Display the annotated frame
+            # cv2.imshow("YOLOv8 Inference", annotated_frame)
+            # cv2.waitKey(50)
+            # cv2.destroyAllWindows()
+
+            # Save the annotated frame
+            cv2.imwrite(os.path.join(results_path, img), annotated_frame)
 
 
 print('Done')
