@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     # Display the annotated frame
     cv2.imshow("YOLOv8 Inference", annotated_frame)
-    cv2.waitKey(100)
+    cv2.waitKey(50)
     cv2.destroyAllWindows()
 
 
