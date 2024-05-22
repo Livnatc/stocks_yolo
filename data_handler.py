@@ -16,7 +16,24 @@ if __name__ == '__main__':
     data.index = pd.to_datetime(data.index)
 
     # Plot the candlestick chart
-    mpf.plot(data, type='candle', style='charles', title=f'Candlestick chart for {ticker}', ylabel='Price',
-             datetime_format='%Y-%m-%dT%H:%M:%S')
+    # mpf.plot(data, type='candle', style='charles', title=f'Candlestick chart for {ticker}', ylabel='Price',
+    #          datetime_format='%Y-%m-%dT%H:%M:%S')
+
+    fig, ax = mpf.plot(data, type='candle', style='charles', returnfig=True)
+
+    # Remove ticks and labels
+    ax[0].set_xticks([])
+    ax[0].set_yticks([])
+    ax[0].set_xlabel('')
+    ax[0].set_ylabel('')
+    ax[0].title.set_text('')
+
+    # Adjust the layout to remove whitespace
+    fig.tight_layout(pad=0)
+
+    # Show the plot
+    fig.savefig('test.png', bbox_inches='tight', pad_inches=0)
+    mpf.show()
+
 
     print(data)
