@@ -2,15 +2,16 @@ import torch
 from ultralyticsplus import YOLO, render_result
 import cv2
 import os
+import pandas as pd
 
 
 if __name__ == '__main__':
 
-    results_path = 'results_stocks-22-05-24_new'
+    results_path = 'results_stocks-23-05-24'
     if not os.path.exists(results_path):
         os.makedirs(results_path)
 
-    src_data_path = 'stocks-22-05-24'
+    src_data_path = 'stocks-23-05-24'
     src_data = os.listdir(src_data_path)
 
     # load model
@@ -22,6 +23,7 @@ if __name__ == '__main__':
     model.overrides['agnostic_nms'] = False  # NMS class-agnostic
     model.overrides['max_det'] = 1000  # maximum number of detections per image
 
+    df_results = []
     for img in src_data:
         if img.endswith('.png'):
 
@@ -54,6 +56,9 @@ if __name__ == '__main__':
                         print('Strong Bullish Engulfing for {img}')
                         # Save the annotated frame
                         cv2.imwrite(os.path.join(results_path, img), annotated_frame)
+                        df_results.append([img, 'W_bottom', results[0].boxes.conf[idx_box]])
 
+df_results = pd.DataFrame(df_results, columns=['img', 'pattern', 'confidence'])
+df_results.to_csv(os.path.join(results_path, 'results.csv'), index=False)
 
 print('Done')
