@@ -16,7 +16,7 @@ Finds the stocks that apply for these conditions:
 #  	P/FCF  < 15
 
 
-## Moving Average Crossover Startegy:
+## Moving Average Crossover Strategy:
 if the 10-day moving average is above the 20-day moving average, then the stock is considered to be in an uptrend.
 
 '''
@@ -77,51 +77,12 @@ def get_growth_stocks():
             print(f'{stock} cannot be calculated for these conditions')
             pass
 
-
     with open('stocks.txt', 'w') as f:
         for item in stocks_list:
             f.write("%s\n" % item)
 
     print(stocks_list)
     return stocks_list
-
-
-def moving_average_crossover(ticker):
-
-    df = yf.download(ticker, start=start_date, end=end_date)
-    df['SMA_10'] = df['Close'].rolling(window=10).mean()
-    df['SMA_20'] = df['Close'].rolling(window=20).mean()
-    # Plot the closing prices and SMAs
-    # Create the plot
-    fig = go.Figure()
-
-    # Add closing price trace
-    fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price', line=dict(color='blue')))
-
-    # Add 10-day SMA trace
-    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_10'], mode='lines', name='10-Day SMA', line=dict(color='orange')))
-
-    # Add 20-day SMA trace
-    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='20-Day SMA', line=dict(color='green')))
-
-    # Customize the layout
-    fig.update_layout(
-        title=f'{ticker} Closing Prices and SMAs',
-        xaxis_title='Date',
-        yaxis_title='Price',
-        legend=dict(x=0, y=1.0),
-        hovermode='x unified'
-    )
-
-    # Show the plot
-    # Save the plot as an HTML file
-    fig.write_html(f"sma_plot_{stock}.html")
-
-    # Save the plot as a static image (PNG)
-    fig.write_image(f"sma_plot_{stock}.png", engine="kaleido")
-
-    signal = df['SMA_10'].iloc[-1] > df['SMA_20'].iloc[-1]  # Simple crossover signal
-    return signal
 
 
 if __name__ == '__main__':
