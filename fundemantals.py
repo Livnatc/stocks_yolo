@@ -1,5 +1,7 @@
 import yfinance as yf
 import pandas as pd
+import datetime
+import plotly.graph_objs as go
 
 '''
 Finds the stocks that apply for these conditions:
@@ -15,8 +17,7 @@ Finds the stocks that apply for these conditions:
 
 '''
 
-
-if __name__ == '__main__':
+def get_growth_stocks():
     # Get the holdings of the SPDR S&P 500 ETF Trust (SPY)
     sp500_stocks = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')[0]
     sp500_stocks = sp500_stocks.Symbol.to_list()
@@ -63,14 +64,83 @@ if __name__ == '__main__':
             ev = data.info['enterpriseToEbitda'] < 10
 
             # Check if P/FCF  < 15  price share/ (levered free cash flow/ shares outstanding).
-            pfcf = data.info['open'] / (c.loc['Free Cash Flow'].iloc[0]/ data.info.get('sharesOutstanding')) < 15
+            pfcf = data.info['open'] / (c.loc['Free Cash Flow'].iloc[0] / data.info.get('sharesOutstanding')) < 15
 
-
-            if sales_inc > 1.1 and erning_inc > 1.1 and debt and roe > 1.1 and peg and ps and pb and ev and pfcf:
+            if sales_inc > 1.1 and erning_inc > 1.1 and debt:  # and roe > 1.1 and peg and ps and pb and ev and pfcf:
                 print(f'{stock} applies for the conditions')
                 stocks_list.append(stock)
         except:
             print(f'{stock} cannot be calculated for these conditions')
             pass
 
-print(stocks_list)
+
+    with open('stocks.txt', 'w') as f:
+        for item in stocks_list:
+            f.write("%s\n" % item)
+
+    print(stocks_list)
+    return stocks_list
+
+
+def moving_average_crossover(ticker):
+
+    df = yf.download(ticker, start=start_date, end=end_date)
+    df['SMA_10'] = df['Close'].rolling(window=10).mean()
+    df['SMA_20'] = df['Close'].rolling(window=20).mean()
+    # Plot the closing prices and SMAs
+    # Create the plot
+    fig = go.Figure()
+
+    # Add closing price trace
+    fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price', line=dict(color='blue')))
+
+    # Add 10-day SMA trace
+    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_10'], mode='lines', name='10-Day SMA', line=dict(color='orange')))
+
+    # Add 20-day SMA trace
+    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='20-Day SMA', line=dict(color='green')))
+
+    # Customize the layout
+    fig.update_layout(
+        title=f'{ticker} Closing Prices and SMAs',
+        xaxis_title='Date',
+        yaxis_title='Price',
+        legend=dict(x=0, y=1.0),
+        hovermode='x unified'
+    )
+
+    # Show the plot
+    fig.show()
+    signal = df['SMA_10'].iloc[-1] > df['SMA_20'].iloc[-1]  # Simple crossover signal
+    return signal
+
+
+if __name__ == '__main__':
+
+    search_stocks_flag = False
+    if search_stocks_flag:
+        stocks_list = get_growth_stocks()
+    else:
+        try:
+            with open('stocks.txt') as f:
+                stocks_list = f.readlines()
+                stocks_list = [x.strip() for x in stocks_list]
+        except:
+            print('No stocks found')
+            stocks_list = get_growth_stocks()
+
+    # check if the stock is above MA:
+    # Define the date range
+    end_date = datetime.datetime.now() - datetime.timedelta(days=5)
+    start_date = end_date - datetime.timedelta(days=100)  # 30 days of historical data
+    potential_risers = []
+
+    for stock in stocks_list:
+        if moving_average_crossover(stock):
+                print(f'{stock} is above MA')
+                potential_risers.append(stock)
+
+    print(potential_risers)
+    with open('potential_risers.txt', 'w') as f:
+        for item in potential_risers:
+            f.write("%s\n" % item)
