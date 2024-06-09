@@ -15,6 +15,10 @@ Finds the stocks that apply for these conditions:
 #  	EV/EBITDA < 10
 #  	P/FCF  < 15
 
+
+## Moving Average Crossover Startegy:
+if the 10-day moving average is above the 20-day moving average, then the stock is considered to be in an uptrend.
+
 '''
 
 def get_growth_stocks():
@@ -110,7 +114,12 @@ def moving_average_crossover(ticker):
     )
 
     # Show the plot
-    fig.show()
+    # Save the plot as an HTML file
+    fig.write_html(f"sma_plot_{stock}.html")
+
+    # Save the plot as a static image (PNG)
+    fig.write_image(f"sma_plot_{stock}.png", engine="kaleido")
+
     signal = df['SMA_10'].iloc[-1] > df['SMA_20'].iloc[-1]  # Simple crossover signal
     return signal
 
