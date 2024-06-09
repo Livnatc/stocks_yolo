@@ -87,30 +87,4 @@ def get_growth_stocks():
 
 if __name__ == '__main__':
 
-    search_stocks_flag = False
-    if search_stocks_flag:
-        stocks_list = get_growth_stocks()
-    else:
-        try:
-            with open('stocks.txt') as f:
-                stocks_list = f.readlines()
-                stocks_list = [x.strip() for x in stocks_list]
-        except:
-            print('No stocks found')
-            stocks_list = get_growth_stocks()
-
-    # check if the stock is above MA:
-    # Define the date range
-    end_date = datetime.datetime.now() - datetime.timedelta(days=5)
-    start_date = end_date - datetime.timedelta(days=100)  # 30 days of historical data
-    potential_risers = []
-
-    for stock in stocks_list:
-        if moving_average_crossover(stock):
-                print(f'{stock} is above MA')
-                potential_risers.append(stock)
-
-    print(potential_risers)
-    with open('potential_risers.txt', 'w') as f:
-        for item in potential_risers:
-            f.write("%s\n" % item)
+    stocks_list = get_growth_stocks()
