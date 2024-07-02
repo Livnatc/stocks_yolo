@@ -38,6 +38,9 @@ def moving_average_crossover(ticker, start_date, end_date, X, Y):
         df['EMA_X'] = df['Close'].ewm(span=X, adjust=False).mean()
         df['EMA_Y'] = df['Close'].ewm(span=Y, adjust=False).mean()
         # Plot the closing prices and EMAs
+
+        if not os.path.exists(f"potential_risers_figs/{month - 1}"):
+            os.makedirs(f"potential_risers_figs/{month - 1}")
         # Create the plot
         fig = go.Figure()
 
@@ -56,6 +59,7 @@ def moving_average_crossover(ticker, start_date, end_date, X, Y):
             hovermode='x unified'
         )
         # fig.show()
+        fig.write_html(f"potential_risers_figs/{month - 1}/{stock}.html")
 
         return df['EMA_X'], df['EMA_Y'], df['Close']
 
@@ -106,7 +110,7 @@ if __name__ == '__main__':
         for s in potential_risers:
             stock = s.iloc[0]['Stock']
             mean_diff = s['Difference'].mean()
-            df = yf.download(stock, start=datetime.datetime(2024, month-1, 28), end=datetime.datetime(2024, month, 15))
+            df = yf.download(stock, start=datetime.datetime(2024, month-1, 28), end=datetime.datetime(2024, month, 25))
             close_max = df['Close'][3:].max()
             close_start = df['Close'][0]
 
@@ -119,8 +123,8 @@ if __name__ == '__main__':
             fig = go.Figure()
 
             # Add closing price trace
-            if not os.path.exists(f"potential_risers_figs/{month}"):
-                os.makedirs(f"potential_risers_figs/{month}")
+            if not os.path.exists(f"potential_risers_figs/{month-1}"):
+                os.makedirs(f"potential_risers_figs/{month-1}")
 
             fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price', line=dict(color='blue')))
             # Customize the layout
@@ -131,7 +135,7 @@ if __name__ == '__main__':
                 legend=dict(x=0, y=1.0),
                 hovermode='x unified'
             )
-            fig.write_html(f"potential_risers_figs/{month}/{stock}.html")
+            fig.write_html(f"potential_risers_figs/{month-1}/{stock}_eval.html")
 
         print(f"**** eval results month = {month}****")
         print(f'Total sucsess {succses} out of {len(potential_risers)}')
