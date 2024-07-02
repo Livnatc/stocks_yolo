@@ -1,4 +1,5 @@
 import yfinance as yf
+from yahoofinancials import YahooFinancials
 import mplfinance as mpf
 import pandas as pd
 import os
@@ -6,7 +7,7 @@ import os
 
 if __name__ == '__main__':
 
-    export_path = 'stocks-22-05-24'
+    export_path = 'stocks-23-05-24'
 
     if not os.path.exists(export_path):
         os.makedirs(export_path)
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     for stock in sp500_stocks:
         print(stock)
         # Download stock data
-        data = yf.download(stock, period="5d", interval='30m')
+        data = yf.download(stock, period="1y", interval='1wk')
 
         # Create a candlestick chart
         # Format the index without spaces

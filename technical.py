@@ -14,8 +14,9 @@ Finds the stocks that apply for these conditions:
 def moving_average_crossover(ticker):
 
     df = yf.download(ticker, start=start_date, end=end_date)
+    df['SMA_5'] = df['Close'].rolling(window=5).mean()
     df['SMA_10'] = df['Close'].rolling(window=10).mean()
-    df['SMA_20'] = df['Close'].rolling(window=20).mean()
+    df['SMA_50'] = df['Close'].rolling(window=50).mean()
     # Plot the closing prices and SMAs
     # Create the plot
     fig = go.Figure()
@@ -24,10 +25,11 @@ def moving_average_crossover(ticker):
     fig.add_trace(go.Scatter(x=df.index, y=df['Close'], mode='lines', name='Close Price', line=dict(color='blue')))
 
     # Add 10-day SMA trace
+    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_5'], mode='lines', name='5-Day SMA', line=dict(color='orange')))
     fig.add_trace(go.Scatter(x=df.index, y=df['SMA_10'], mode='lines', name='10-Day SMA', line=dict(color='orange')))
 
     # Add 20-day SMA trace
-    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_20'], mode='lines', name='20-Day SMA', line=dict(color='green')))
+    fig.add_trace(go.Scatter(x=df.index, y=df['SMA_50'], mode='lines', name='50-Day SMA', line=dict(color='green')))
 
     # Customize the layout
     fig.update_layout(
@@ -40,12 +42,12 @@ def moving_average_crossover(ticker):
 
     # Show the plot
     # Save the plot as an HTML file
-    fig.write_html(f"technical_figs/sma_plot_{stock}.html")
+    fig.write_html(f"technical_figs\\sma_plot_{stock}.html")
 
     # Save the plot as a static image (PNG)
-    fig.write_image(f"technical_figs/sma_plot_{stock}.png", engine="kaleido")
+    fig.write_image(f"technical_figs\\sma_plot_{stock}.png", engine="kaleido")
 
-    signal = df['SMA_10'].iloc[-1] > df['SMA_20'].iloc[-1]  # Simple crossover signal
+    signal = df['SMA_5'].iloc[-1] > df['SMA_50'].iloc[-1] and df['SMA_10'].iloc[-1] > df['SMA_50'].iloc[-1]# Simple crossover signal
     return signal
 
 
