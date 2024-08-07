@@ -38,15 +38,15 @@ if __name__ == '__main__':
                     erning_inc = f.get_earning_increase()
                     debt = f.get_debt_lower()
                     roe = f.get_roe()
-                    peg = f.get_peg()
-                    ps = f.get_ps()
-                    pb = f.get_pb()
-                    ev = f.get_ev()
-                    pfcf = f.get_pfcf()
+                    # peg = f.get_peg()
+                    # ps = f.get_ps()
+                    # pb = f.get_pb()
+                    # ev = f.get_ev()
+                    # pfcf = f.get_pfcf()
                 except:
                     pass
 
-                new_row = {'Stock': stock, 'Sales Increase': sales_inc, 'Earning Increase': erning_inc, 'Debt': debt, 'ROE': roe, 'PEG': peg, 'P/S': ps, 'P/B': pb, 'EV/EBITDA': ev, 'P/FCF': pfcf , 'Revenue': revenue[i]}
+                new_row = {'Stock': stock, 'Sales Increase': sales_inc, 'Earning Increase': erning_inc, 'Debt': debt, 'ROE': roe, 'Revenue': revenue[i]}
                 # Convert the new row to a DataFrame
                 new_row_df = pd.DataFrame([new_row])
 
